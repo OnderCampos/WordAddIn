@@ -4,8 +4,8 @@ import {
   Field, Textarea, makeStyles, Button, Label, Tooltip, Card,
   CardPreview,
 } from "@fluentui/react-components";
-import generate from "../chatbot"; 
-import buildResponse from "../word";
+import generate from "../chatbot";
+import { buildResponse, improveSelectedText, translateSelectedText } from "../word";
 import { ArrowSyncFilled, ArrowRightRegular, ArrowLeftRegular, EditRegular } from "@fluentui/react-icons";
 import { ColorChangingLoading } from "./ColorChangingLoading";
 import Header from "./Header";
@@ -18,7 +18,6 @@ const useStyles = makeStyles({
     flexDirection: "column",
     alignItems: "center",
   },
-
   box: {
     width: "300px",
     h1: {
@@ -29,9 +28,10 @@ const useStyles = makeStyles({
   bottomCard: {
     paddingTop: "10px",
     paddingRight: "10px",
+    marginRight: "20px",
     paddingLeft: "10px",
     marginLeft: "10px",
-    marginRight: "10px",
+    marginRight: "20px",
     marginBottom: "10px",
     display: "flex",
     justifyContent: "space-between",
@@ -51,14 +51,12 @@ const useStyles = makeStyles({
       borderColor: "#245266"
     }
   },
-
   reloadButton: {
     backgroundColor: "#fff !important",
     borderColor: "#fff !important",
     color: "#2D5871 !important",
     boxShadow: "0px 0px 10px 1px #EDEDED"
   },
-
   icon: { fontSize: "24px" },
   count: {
     marginRight: "4px",
@@ -66,24 +64,31 @@ const useStyles = makeStyles({
     marginTop: "15px",
     fontSize: "20px"
   },
-
   slideButtons: {
     display: "flex",
     justifyContent: "space-between",
     flexDirection: "row",
   },
-
   textarea: {
-    marginRight: "15px",
-    marginLeft: "15px",
-    paddingRight: "15px",
-    height: "100px"
+    height: "100px",
+    paddingRight: "10px",
+    marginRight: "25px"
   },
   card: {
-    marginTop: "15px",
-    marginLeft: "15px",
-    marginRight: "15px",
-    paddingRight: "20px"
+    marginTop: "10px",
+    marginLeft: "15px"
+  },
+  improveButton: {
+    backgroundColor: "#3F7AE8",
+    borderColor: "#2D5871",
+    color: "#ffffff",
+    fontWeight: "bold",
+    borderRadius: "15px",
+    padding: "10px",
+    '&:hover': {
+      backgroundColor: "#245266",
+      borderColor: "#245266"
+    }
   }
 
 });
@@ -96,10 +101,28 @@ const TextInsertion = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   async function handleTextInsertion() {
-      setIsLoading(true)
-      var response = await generate(promptText)
-      await buildResponse(response)
-      setIsLoading(false)
+    setIsLoading(true)
+    var response = await generate(promptText)
+    await buildResponse(response)
+    setIsLoading(false)
+  }
+
+  async function handleImproveSelectedText() {
+    setIsLoading(true);
+    await improveSelectedText();
+    setIsLoading(false);
+  }
+
+  async function handleTranslateToSpanish() {
+    setIsLoading(true);
+    await translateSelectedText("spanish")
+    setIsLoading(false);
+  }
+
+  async function handleTranslateToEnglish() {
+    setIsLoading(true);
+    await translateSelectedText("english")
+    setIsLoading(false);
   }
 
   const handlePromtText = async (event) => {
@@ -131,20 +154,20 @@ const TextInsertion = () => {
 
   return (
     <div className={styles.textPromptAndInsertion}>
-      {isLoading && <ColorChangingLoading/>}
+      {isLoading && <ColorChangingLoading />}
       <Card>
-      <Header
-        logo={"assets/icon_frida_azul.svg"}
-        title={""}
-        message={'Welcome to FRIDA\'s LLM powered assistant'}
-      />
+        <Header
+          logo={"assets/icon_frida_azul.svg"}
+          title={""}
+          message={'Welcome to FRIDA\'s LLM powered assistant'}
+        />
         <CardPreview>
           <div className={styles.card}>
             <div className='Row'>
               <Label size="large"> <EditRegular className={styles.icon} />
                 What would you like to generate?
               </Label>
-             
+
 
               <Field size="large" appearance="filled-darker" label="Prompt">
                 <Textarea value={promptText} className={styles.textarea} onChange={handlePromtText} />
@@ -169,6 +192,13 @@ const TextInsertion = () => {
             </div>
           </div>
         </CardPreview>
+      </Card>
+
+      <Card style={{ marginTop: "10px" }}>
+        <h2>Funtions</h2>
+        <Button onClick={handleImproveSelectedText} className={styles.improveButton}>Improve selected text</Button>
+        <Button onClick={handleTranslateToSpanish} className={styles.improveButton}>Translate to Spanish</Button>
+        <Button onClick={handleTranslateToEnglish} className={styles.improveButton}>Translate to English</Button>
       </Card>
     </div>
   );

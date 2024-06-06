@@ -7,7 +7,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    paddingBottom: "30px",
+    paddingBottom: "20px",
     paddingTop: "10px",
   },
   message: {

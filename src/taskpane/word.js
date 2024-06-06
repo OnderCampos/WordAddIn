@@ -1,4 +1,6 @@
-export default async function buildResponse(response) {
+import chat from './chatbot';
+
+export async function buildResponse(response) {
     Word.run(async (context) => {
         let body = context.document.body;
 
@@ -48,4 +50,41 @@ export default async function buildResponse(response) {
 
         await context.sync();
       });
+}
+
+export async function improveSelectedText() {
+    await Word.run(async (context) => {
+        const range = context.document.getSelection();
+        range.load("text");
+        await context.sync();
+
+        const prompt = `
+        Improve the following text:
+          ${range.text}
+        `;
+
+        var response = await chat(prompt)
+        
+        range.insertText(response, Word.InsertLocation.replace);
+        await context.sync();
+    });
+}
+
+export async function translateSelectedText(language) {
+  await Word.run(async (context) => {
+      const range = context.document.getSelection();
+      range.load("text");
+      await context.sync();
+
+      const prompt = `
+      Translate the following text to ${language}:
+        ${range.text}
+      Important response only with the translated text.
+      `;
+
+      var response = await chat(prompt) 
+      
+      range.insertText(response, Word.InsertLocation.replace);
+      await context.sync();
+  });
 }
